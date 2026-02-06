@@ -1,7 +1,7 @@
 name: Windows VNC Setup
 
 on:
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:
   push:
     branches: [ main ]
 
@@ -15,93 +15,83 @@ jobs:
 
     - name: Install VNC Server
       run: |
-        # Download and install TightVNC
+        # Download TightVNC
         $vncUrl = "https://www.tightvnc.com/download/2.8.59/tightvnc-2.8.59-gpl-setup-64bit.msi"
         $installerPath = "$env:TEMP\tightvnc.msi"
         Invoke-WebRequest -Uri $vncUrl -OutFile $installerPath
         
-        # Install TightVNC silently
-        msiexec /i $installerPath /quiet /norestart ADDLOCAL="Server" SET_USEVNCAUTHENTICATION=1 VALUE_OF_USEVNCAUTHENTICATION=1 SET_PASSWORD=1 VALUE_OF_PASSWORD=github123 SET_USECONTROLAUTHENTICATION=1 VALUE_OF_USECONTROLAUTHENTICATION=1
-        
-        # Wait for installation
+        # Install TightVNC
+        msiexec /i $installerPath /quiet /norestart ADDLOCAL="Server"
         Start-Sleep -Seconds 30
         
-        # Configure VNC Server
+        # Configure VNC
         $regPath = "HKLM:\SOFTWARE\TightVNC\Server"
-        New-ItemProperty -Path $regPath -Name "Password" -Value "github123" -PropertyType String -Force
-        New-ItemProperty -Path $regPath -Name "ControlPassword" -Value "github123" -PropertyType String -Force
-        New-ItemProperty -Path $regPath -Name "RfbPort" -Value 5900 -PropertyType DWord -Force
+        New-ItemProperty -Path $regPath -Name "Password" -Value "github123" -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $regPath -Name "ControlPassword" -Value "github123" -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $regPath -Name "RfbPort" -Value 5900 -PropertyType DWord -Force | Out-Null
         
         # Start VNC Service
-        Start-Service "tvnserver"
+        Start-Service "tvnserver" -ErrorAction SilentlyContinue
 
     - name: Configure Windows Firewall
       run: |
-        # Open ports for VNC
+        # Open VNC port
         New-NetFirewallRule -DisplayName "VNC Server" -Direction Inbound -LocalPort 5900 -Protocol TCP -Action Allow
-        New-NetFirewallRule -DisplayName "VNC Server HTTP" -Direction Inbound -LocalPort 5800 -Protocol TCP -Action Allow
+        New-NetFirewallRule -DisplayName "VNC HTTP" -Direction Inbound -LocalPort 5800 -Protocol TCP -Action Allow
 
-    - name: Enable RDP (Remote Desktop)
+    - name: Enable RDP
       run: |
         # Enable Remote Desktop
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         
-        # Create user for remote access
+        # Create admin user
         $username = "runneradmin"
         $password = ConvertTo-SecureString "GitHub@12345" -AsPlainText -Force
-        New-LocalUser -Name $username -Password $password -FullName "GitHub Runner Admin"
+        New-LocalUser -Name $username -Password $password -FullName "GitHub Runner"
         Add-LocalGroupMember -Group "Administrators" -Member $username
         Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
 
-    - name: Get Public IP and Create Connection Info
+    - name: Get Connection Info
       run: |
         # Get public IP
         $ip = (Invoke-RestMethod -Uri "https://api.ipify.org").Trim()
         
-        # Create connection info file
-        $info = @"
+        # Create info with here-string - INI YANG DIPERBAIKI
+        $info = @'
 ===========================================
 WINDOWS VNC CONNECTION INFORMATION
 ===========================================
-PUBLIC IP: $ip
+PUBLIC IP: {0}
 VNC PORT: 5900
 VNC PASSWORD: github123
 RDP PORT: 3389
 RDP USERNAME: runneradmin
 RDP PASSWORD: GitHub@12345
 
-===========================================
 CONNECTION STRINGS:
-===========================================
-VNC: vnc://$ip:5900
-RDP: mstsc /v:$ip:3389
+VNC: vnc://{0}:5900
+RDP: mstsc /v:{0}:3389
 
-===========================================
 NOTES:
-===========================================
-1. GitHub Actions runner will run for 6 hours max
-2. Ports are open for external connections
-3. Make sure VNC client is installed
-"@
+1. Runner runs max 6 hours
+2. Change passwords for security
+3. Use VNC or RDP client
+'@ -f $ip
         
-        # Save to file and display
+        # Save and display
         $info | Out-File -FilePath "$env:GITHUB_WORKSPACE\connection-info.txt"
         Write-Output $info
 
-    - name: Keep runner alive
+    - name: Keep Alive
       run: |
-        # Script to keep runner alive
-        $timeout = New-TimeSpan -Hours 6
-        $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-        
-        while ($stopwatch.Elapsed -lt $timeout) {
-          Write-Output "Runner is still active. Time remaining: $($timeout - $stopwatch.Elapsed)"
-          Start-Sleep -Seconds 300
-        }
+        Write-Host "Windows VNC is running..."
+        Write-Host "IP will be shown above"
+        # Keep alive for 1 hour (3600 seconds)
+        Start-Sleep -Seconds 3600
 
-    - name: Upload Connection Info
+    - name: Upload Info
       uses: actions/upload-artifact@v3
       with:
-        name: windows-connection-info
+        name: windows-connection
         path: connection-info.txt
