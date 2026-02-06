@@ -1,0 +1,38 @@
+name: Windows VNC Setup
+on: [push, workflow_dispatch]
+
+jobs:
+  setup-vnc:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up VNC Server
+      shell: powershell
+      run: |
+        # Download TightVNC atau VNC server lainnya
+        $vncUrl = "https://www.tightvnc.com/download/2.8.81/tightvnc-2.8.81-gpl-setup-64bit.msi"
+        $vncInstaller = "tightvnc.msi"
+        
+        # Download installer
+        Invoke-WebRequest -Uri $vncUrl -OutFile $vncInstaller
+        
+        # Install TightVNC secara silent
+        # Catatan: GitHub Actions runner mungkin tidak mendukung UI
+        msiexec /i $vncInstaller /quiet /qn ADDLOCAL="Server" SERVER_REGISTER_AS_SERVICE=1 SERVER_ADD_FIREWALL_EXCEPTION=1
+        
+        # Tunggu instalasi selesai
+        Start-Sleep -Seconds 30
+        
+        # Set password VNC (contoh: "vncpassword")
+        # Ini hanya contoh, dalam produksi gunakan secrets
+        $vncPath = "C:\Program Files\TightVNC\tvnserver.exe"
+        if (Test-Path $vncPath) {
+            & $vncPath -controlservice -stop
+            & $vncPath -controlservice -start
+        }
+        
+        # Tampilkan status
+        Get-Service | Where-Object {$_.Name -like "*vnc*"}
