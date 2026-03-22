@@ -620,4 +620,103 @@
         animateNavClick(btn);
         // 3. ganti halaman
         setActivePage(id);
-        // 4. feedback haptic (vibrasi ringan jik
+        // 4. feedback haptic (vibrasi ringan jika support)
+        if(navigator.vibrate) navigator.vibrate(20);
+        // 5. Toast notifikasi kecil
+        showMiniToast(`✨ ${btn.querySelector('span')?.innerText || 'Tab'} aktif ✨`);
+      };
+      btn.addEventListener('click', clickHandler);
+    }
+  }
+  
+  // fungsi mini toast cantik
+  function showMiniToast(msg) {
+    const existingToast = document.querySelector('.custom-toast-mini');
+    if(existingToast) existingToast.remove();
+    const toast = document.createElement('div');
+    toast.className = 'custom-toast-mini';
+    toast.innerText = msg;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '85px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.backgroundColor = 'rgba(0, 20, 40, 0.95)';
+    toast.style.backdropFilter = 'blur(12px)';
+    toast.style.border = '1px solid #3b82f6';
+    toast.style.padding = '8px 20px';
+    toast.style.borderRadius = '40px';
+    toast.style.fontSize = '0.8rem';
+    toast.style.fontWeight = '500';
+    toast.style.zIndex = '9999';
+    toast.style.color = '#eef2ff';
+    toast.style.boxShadow = '0 8px 20px rgba(0,0,0,0.3)';
+    toast.style.fontFamily = "'Inter', sans-serif";
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transition = '0.3s';
+      setTimeout(() => toast.remove(), 300);
+    }, 1600);
+  }
+  
+  // demo tombol-tombol di dalam halaman juga memiliki animasi klik dan ripple
+  function setupInnerButtons() {
+    const demoButtons = ['homeDemoBtn', 'exploreDemoBtn', 'notifDemoBtn', 'profileDemoBtn'];
+    demoButtons.forEach(id => {
+      const btn = document.getElementById(id);
+      if(btn) {
+        btn.addEventListener('click', (e) => {
+          createRipple(e, btn);
+          btn.style.transform = 'scale(0.96)';
+          setTimeout(() => { if(btn) btn.style.transform = ''; }, 150);
+          showMiniToast('🎉 Animasi klik keren! 🎉');
+          if(navigator.vibrate) navigator.vibrate(15);
+          // efek ekstra pada progress fill
+          const fills = document.querySelectorAll('.progress-fill');
+          fills.forEach(fill => {
+            fill.style.opacity = '0.7';
+            setTimeout(() => fill.style.opacity = '1', 250);
+          });
+        });
+      }
+    });
+  }
+  
+  // tambahkan efek ripple pada semua tombol dengan class btn-demo
+  function addGlobalRippleToButtons() {
+    const allBtns = document.querySelectorAll('.btn-demo');
+    allBtns.forEach(btn => {
+      if(!btn.hasAttribute('data-ripple-attached')) {
+        btn.setAttribute('data-ripple-attached', 'true');
+        btn.addEventListener('click', (e) => {
+          createRipple(e, btn);
+        });
+      }
+    });
+  }
+  
+  // set indicator awal saat load
+  window.addEventListener('load', () => {
+    setActivePage('home');
+    attachNavEvents();
+    setupInnerButtons();
+    addGlobalRippleToButtons();
+    setTimeout(() => {
+      updateIndicator('home');
+    }, 100);
+  });
+  
+  // saat resize, update posisi indicator
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      const activePageId = Object.keys(pages).find(key => pages[key]?.classList.contains('active-page'));
+      if(activePageId) updateIndicator(activePageId);
+    }, 150);
+  });
+  
+  console.log('✅ Fixed Bottom Navigation dengan animasi klik & ripple siap!');
+</script>
+</body>
+</html>
