@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>AniStream | Nonton Anime Sub Indo HD</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Swiper JS CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #0a0c15;
+      color: #eef5ff;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #141b2b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      border-radius: 10px;
+    }
+
+    /* Background Gradient */
+    .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 30%, #1a1f2e, #0a0c15);
+      z-index: -2;
+    }
+
+    /* Glassmorphism Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 12, 21, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 107, 107, 0.2);
+      padding: 1rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24, #ff8c5a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .logo i {
+      background: none;
+      -webkit-background-clip: unset;
+      color: #ff6b6b;
+      margin-right: 5px;
+    }
+
+    .search-bar {
+      display: flex;
+      background: rgba(30, 35, 50, 0.8);
+      border-radius: 50px;
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      transition: all 0.3s;
+    }
+
+    .search-bar:focus-within {
+      border-color: #ff6b6b;
+      box-shadow: 0 0 15px rgba(255, 107, 107, 0.2);
+    }
+
+    .search-bar input {
+      background: transparent;
+      border: none;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      outline: none;
+      width: 220px;
+    }
+
+    .search-bar button {
+      background: transparent;
+      border: none;
+      color: #ff8c5a;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    .nav-icons {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-icons i {
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #b9c8ff;
+    }
+
+    .nav-icons i:hover {
+      color: #ff6b6b;
+      transform: scale(1.1);
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      margin: 1rem 5% 2rem;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      height: 450px;
+    }
+
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, #0a0c15 0%, transparent 70%), url('https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=2070&auto=format') center/cover;
+      filter: brightness(0.7);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 3rem;
+      max-width: 550px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-badge {
+      background: rgba(255, 107, 107, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      width: fit-content;
+      font-size: 0.8rem;
+      border-left: 3px solid #ff6b6b;
+      margin-bottom: 1rem;
+    }
+
+    .hero-content h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin: 0.5rem 0;
+      line-height: 1.2;
+    }
+
+    .hero-content p {
+      color: #cbd5ff;
+      margin: 1rem 0;
+    }
+
+    .btn-play {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      width: fit-content;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-play:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+    }
+
+    /* Section Title */
+    .section {
+      padding: 2rem 5%;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      border-left: 4px solid #ff6b6b;
+      padding-left: 1rem;
+    }
+
+    .view-all {
+      color: #ff8c5a;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+
+    .view-all:hover {
+      color: #ff6b6b;
+    }
+
+    /* Anime Cards Grid */
+    .anime-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .anime-card {
+      background: rgba(25, 30, 45, 0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid rgba(255, 107, 107, 0.2);
+    }
+
+    .anime-card:hover {
+      transform: translateY(-8px);
+      border-color: #ff6b6b;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-img {
+      position: relative;
+      height: 240px;
+      overflow: hidden;
+    }
+
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+    }
+
+    .anime-card:hover .card-img img {
+      transform: scale(1.05);
+    }
+
+    .episode-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #ffd966;
+    }
+
+    .card-info {
+      padding: 0.8rem;
+    }
+
+    .card-info h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-info p {
+      font-size: 0.7rem;
+      color: #9aa9c7;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .rating {
+      color: #ffb347;
+    }
+
+    /* Swiper untuk trending */
+    .trending-swiper {
+      margin-top: 1rem;
+      overflow: hidden;
+    }
+
+    .swiper-slide {
+      width: 220px;
+    }
+
+    /* Player Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .modal.active {
+      display: flex;
+      animation: fadeIn 0.3s;
+    }
+
+    .modal-content {
+      max-width: 1000px;
+      width: 100%;
+      background: #11161f;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      border: 1px solid rgba(255, 107, 107, 0.4);
+    }
+
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      background: #000;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .modal-info {
+      padding: 1.5rem;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      background: rgba(0,0,0,0.5);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+
+    .close-modal:hover {
+      background: #ff6b6b;
+      transform: rotate(90deg);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid rgba(255, 107, 107, 0.2);
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #8a99c4;
+    }
+
+    @media (max-width: 768px) {
+      .hero-content h1 {
+        font-size: 1.8rem;
+      }
+      .hero {
+        height: 350px;
+      }
+      .anime-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+      }
+      .card-img {
+        height: 200px;
+      }
+      .search-bar input {
+        width: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-gradient"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo">
+    <i class="fas fa-play-circle"></i> AniStream
+  </div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Cari anime favorit...">
+    <button id="searchBtn"><i class="fas fa-search"></i></button>
+  </div>
+  <div class="nav-icons">
+    <i class="fas fa-bell"></i>
+    <i class="fas fa-user-circle"></i>
+    <i class="fas fa-history"></i>
+  </div>
+</nav>
+
+<!-- Hero Spotlight -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <i class="fas fa-fire"></i> Trending Minggu Ini
+    </div>
+    <h1>Solo Leveling <span style="color:#ff6b6b;">Season 2</span></h1>
+    <p>Shadow Monarch bangkit kembali! Sung Jin-Woo menghadapi ancaman baru yang lebih kuat. Episode terbaru tiap Sabtu.</p>
+    <button class="btn-play" id="heroPlayBtn">
+      <i class="fas fa-play"></i> Tonton Sekarang
+    </button>
+  </div>
+</div>
+
+<!-- Trending Section (Swiper) -->
+<div class="section">
+  <div class="section-header">
+    <h2 class="section-title"><i class="fas fa-chart-line"></i> Trending Hari Ini</h2>
+    <span class="view-all">Lihat Semua <i class="fas fa-arrow-right"></i></span>
+  </div>
+  <div class="trending-swiper swiper">
+    <div class="swiper-wrapper" id="trendingWrapper">
+      <!-- akan diisi JS -->
+    </div>
+    <div class="swiper-pagination"></div>
+  </div>
+</div>
+
+<!-- New Release / Rekomendasi -->
+<div class="section">
+  <div class="section-header">
+    <h2 class="section-title"><i class="fas fa-star"></i> Rekomendasi Untukmu</h2>
+    <span class="view-all">Lainnya</span>
+  </div>
+  <div class="anime-grid" id="animeGrid">
+    <!-- Dynamic content -->
+  </div>
+</div>
+
+<!-- All Anime List -->
+<div class="section">
+  <div class="section-header">
+    <h2 class="section-title"><i class="fas fa-tv"></i> Koleksi Anime Populer</h2>
+    <span class="view-all" id="loadMoreBtn">Muat Lebih</span>
+  </div>
+  <div class="anime-grid" id="allAnimeGrid">
+    <!-- dynamic -->
+  </div>
+</div>
+
+<!-- Modal Player -->
+<div id="playerModal" class="modal">
+  <div class="close-modal" id="closeModalBtn"><i class="fas fa-times"></i></div>
+  <div class="modal-content">
+    <div class="video-container" id="videoContainer">
+      <iframe id="animeIframe" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <div class="modal-info">
+      <h3 id="modalTitle">Solo Leveling Episode 1</h3>
+      <p id="modalDesc">Nikmati anime sub Indo kualitas HD. Episode terbaru setiap minggu.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p><i class="fas fa-film"></i> AniStream — Nonton Anime Sub Indo HD Tanpa Iklan. Update Setiap Hari!</p>
+  <p style="margin-top: 0.5rem;">© 2025 All Rights Reserved | Untuk pengalaman terbaik gunakan koneksi stabil.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  // DATABASE ANIME (Simulasi API)
+  const animeDatabase = [
+    { id: 1, title: "Solo Leveling", episode: "Episode 12", rating: "9.2", year: "2024", image: "https://cdn.myanimelist.net/images/anime/1588/138395.jpg", genre: "Action, Fantasy", videoId: "Yq0y2pzjT48" },
+    { id: 2, title: "Jujutsu Kaisen S2", episode: "Eps 23", rating: "9.0", year: "2023", image: "https://cdn.myanimelist.net/images/anime/1918/138831.jpg", genre: "Action, Supernatural", videoId: "9Tltr0HxbF4" },
+    { id: 3, title: "Attack on Titan Final", episode: "Final Chapter", rating: "9.4", year: "2023", image: "https://cdn.myanimelist.net/images/anime/1976/123710.jpg", genre: "Action, Drama", videoId: "3gRj-6BshTM" },
+    { id: 4, title: "Demon Slayer", episode: "Swordsmith Village", rating: "8.9", year: "2023", image: "https://cdn.myanimelist.net/images/anime/1057/129213.jpg", genre: "Action, Adventure", videoId: "VQGCKvWBDcU" },
+    { id: 5, title: "One Piece", episode: "Ep 1090", rating: "9.1", year: "2024", image: "https://cdn.myanimelist.net/images/anime/1244/138851.jpg", genre: "Adventure, Comedy", videoId: "xLy2mBkqG4Q" },
+    { id: 6, title: "Spy x Family S2", episode: "Eps 35", rating: "8.7", year: "2023", image: "https://cdn.myanimelist.net/images/anime/1963/138464.jpg", genre: "Comedy, Action", videoId: "B6CQeSxR9hs" },
+    { id: 7, title: "Mashle S2", episode: "Eps 12", rating: "8.5", year: "2024", image: "https://cdn.myanimelist.net/images/anime/1127/138673.jpg", genre: "Comedy, Fantasy", videoId: "FjBbr3F-kcA" },
+    { id: 8, title: "Tokyo Revengers S3", episode: "Eps 13", rating: "8.3", year: "2023", image: "https://cdn.myanimelist.net/images/anime/1825/138977.jpg", genre: "Action, Drama", videoId: "7yWvDqLJ3U8" },
+    { id: 9, title: "Blue Lock", episode: "Eps 24", rating: "8.8", year: "2023", image: "https://cdn.myanimelist.net/images/anime/1258/126929.jpg", genre: "Sports, Thriller", videoId: "E5RzBkO15ww" },
+    { id: 10, title: "Oshi no Ko", episode: "Eps 11", rating: "9.0", year: "2023", image: "https://cdn.myanimelist.net/images/anime/1606/129295.jpg", genre: "Drama, Mystery", videoId: "Z1R3QZ3o7Cg" },
+    { id: 11, title: "Frieren", episode: "Eps 28", rating: "9.3", year: "2024", image: "https://cdn.myanimelist.net/images/anime/1015/138006.jpg", genre: "Fantasy, Slice of Life", videoId: "q3_RjVhNqgc" },
+    { id: 12, title: "Vinland Saga S2", episode: "Eps 24", rating: "8.9", year: "2023", image: "https://cdn.myanimelist.net/images/anime/1327/131010.jpg", genre: "Action, Historical", videoId: "f8jZgyr-ugE" }
+  ];
+
+  // trending top 6
+  const trendingAnime = animeDatabase.slice(0, 6);
+  // rekomendasi (mix)
+  const recommendations = animeDatabase.slice(2, 8);
+  // all anime
+  let visibleCount = 8;
+  
+  // Render Anime Card HTML
+  function renderAnimeCard(anime) {
+    return `
+      <div class="anime-card" data-id="${anime.id}" data-title="${anime.title}" data-video="${anime.videoId}" data-desc="${anime.genre} · ${anime.year}">
+        <div class="card-img">
+          <img src="${anime.image}" alt="${anime.title}" onerror="this.src='https://via.placeholder.com/300x400?text=Anime'">
+          <div class="episode-badge">${anime.episode}</div>
+        </div>
+        <div class="card-info">
+          <h4>${anime.title}</h4>
+          <p><span class="rating"><i class="fas fa-star"></i> ${anime.rating}</span> <span>${anime.year}</span></p>
+        </div>
+      </div>
+    `;
+  }
+
+  // Render Trending dengan Swiper
+  function renderTrendingSwiper() {
+    const wrapper = document.getElementById('trendingWrapper');
+    wrapper.innerHTML = trendingAnime.map(anime => `
+      <div class="swiper-slide">
+        <div class="anime-card" data-id="${anime.id}" data-title="${anime.title}" data-video="${anime.videoId}" data-desc="${anime.genre}">
+          <div class="card-img">
+            <img src="${anime.image}" alt="${anime.title}">
+            <div class="episode-badge">Hot</div>
+          </div>
+          <div class="card-info">
+            <h4>${anime.title}</h4>
+            <p><i class="fas fa-eye"></i> ${anime.episode}</p>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    // Init Swiper
+    new Swiper('.trending-swiper', {
+      slidesPerView: 2.2,
+      spaceBetween: 15,
+      freeMode: true,
+      pagination: { clickable: true, el: '.swiper-pagination' },
+      breakpoints: {
+        640: { slidesPerView: 3.2 },
+        768: { slidesPerView: 4.2 },
+        1024: { slidesPerView: 5.2 }
+      }
+    });
+  }
+
+  // Render Rekomendasi Grid
+  function renderRecommendations() {
+    const grid = document.getElementById('animeGrid');
+    grid.innerHTML = recommendations.map(anime => renderAnimeCard(anime)).join('');
+    attachCardEvents();
+  }
+
+  // Render All Anime
+  function renderAllAnime(limit = visibleCount, searchTerm = '') {
+    let filtered = [...animeDatabase];
+    if (searchTerm) {
+      filtered = filtered.filter(anime => anime.title.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
+    const limited = filtered.slice(0, limit);
+    const container = document.getElementById('allAnimeGrid');
+    container.innerHTML = limited.map(anime => renderAnimeCard(anime)).join('');
+    attachCardEvents();
+    // load more button visibility
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+      if (limit >= filtered.length) {
+        loadMoreBtn.style.opacity = '0.5';
+        loadMoreBtn.style.pointerEvents = 'none';
+      } else {
+        loadMoreBtn.style.opacity = '1';
+        loadMoreBtn.style.pointerEvents = 'auto';
+      }
+    }
+    return filtered;
+  }
+
+  // Global variable untuk current filtered list (search)
+  let currentSearchTerm = '';
+
+  // Event untuk card klik -> play anime
+  function attachCardEvents() {
+    document.querySelectorAll('.anime-card').forEach(card => {
+      card.removeEventListener('click', cardClickHandler);
+      card.addEventListener('click', cardClickHandler);
+    });
+  }
+
+  function cardClickHandler(e) {
+    // prevent jika klik dari dalam modal? aman
+    const card = this.closest('.anime-card');
+    if (!card) return;
+    const title = card.dataset.title;
+    const videoId = card.dataset.video;
+    const desc = card.dataset.desc || 'Anime sub Indo kualitas HD';
+    openPlayer(title, videoId, desc);
+  }
+
+  function openPlayer(title, videoId, desc) {
+    const modal = document.getElementById('playerModal');
+    const iframe = document.getElementById('animeIframe');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    // Gunakan embed youtube dengan autoplay
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+    modalTitle.innerText = title;
+    modalDesc.innerText = desc;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Search Functionality
+  function performSearch() {
+    const searchInput = document.getElementById('searchInput').value.trim();
+    currentSearchTerm = searchInput;
+    visibleCount = 8;
+    const filtered = renderAllAnime(visibleCount, currentSearchTerm);
+    // update load more logic for filtered
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+      if (visibleCount >= filtered.length) {
+        loadMoreBtn.style.opacity = '0.5';
+        loadMoreBtn.style.pointerEvents = 'none';
+      } else {
+        loadMoreBtn.style.opacity = '1';
+        loadMoreBtn.style.pointerEvents = 'auto';
+      }
+    }
+  }
+
+  // Load More
+  function loadMore() {
+    let filteredList = animeDatabase;
+    if (currentSearchTerm) {
+      filteredList = animeDatabase.filter(anime => anime.title.toLowerCase().includes(currentSearchTerm.toLowerCase()));
+    }
+    if (visibleCount + 6 <= filteredList.length) {
+      visibleCount += 
