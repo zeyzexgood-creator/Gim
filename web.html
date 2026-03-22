@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D Kamera Tangan - Interaktif</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', 'Poppins', 'Montserrat', sans-serif;
+        }
+        
+        #info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            color: white;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            pointer-events: none;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        #controls-hint {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            color: rgba(255,255,255,0.7);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-family: monospace;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 600px) {
+            #controls-hint { font-size: 10px; bottom: 10px; right: 10px; }
+            #info { font-size: 10px; bottom: 10px; left: 10px; }
+        }
+        
+        .title {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 100;
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            pointer-events: none;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+        
+        @media (max-width: 600px) {
+            .title { font-size: 0.9rem; top: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="title">📷 KAMERA 3D | Drag untuk putar | Geser kanan/kiri</div>
+    <div id="info">✨ Model Kamera Retro + Lensa | Three.js</div>
+    <div id="controls-hint">🖱️ Mouse/Touch: Rotasi & Zoom</div>
+
+    <!-- Import library Three.js dan ekstensi -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // --- Setup Scene, Camera, Renderers ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050b1a); // Warna malam gelap kebiruan
+        scene.fog = new THREE.FogExp2(0x050b1a, 0.008); // kabut halus
+
+        // Kamera utama (perspektif)
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5, 3, 6);
+        camera.lookAt(0, 0.5, 0);
+
+        // WebGL Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true; // Aktifkan shadow untuk efek realistis
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+
+        // CSS2 Renderer untuk teks label
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.style.left = '0px';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        document.body.appendChild(labelRenderer.domElement);
+
+        // --- Controls (Orbit dengan interaksi sentuhan dan mouse) ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;      // inertial effect
+        controls.dampingFactor = 0.05;
+        controls.rotateSpeed = 1.5;
+        controls.zoomSpeed = 1.2;
+        controls.panSpeed = 0.8;
+        controls.enableZoom = true;
+        controls.enablePan = true;
+        controls.target.set(0, 0.8, 0);
+        
+        // --- Lighting System untuk efek kamera yang meyakinkan ---
+        
+        // Ambient light lembut
+        const ambientLight = new THREE.AmbientLight(0x404060, 0.65);
+        scene.add(ambientLight);
+        
+        // Main directional light (simulasi sinar matahari / studio)
+        const mainLight = new THREE.DirectionalLight(0xfff5e0, 1.2);
+        mainLight.position.set(3, 5, 2);
+        mainLight.castShadow = true;
+        mainLight.receiveShadow = false;
+        mainLight.shadow.mapSize.width = 1024;
+        mainLight.shadow.mapSize.height = 1024;
+        mainLight.shadow.camera.near = 0.5;
+        mainLight.shadow.camera.far = 8;
+        mainLight.shadow.camera.left = -5;
+        mainLight.shadow.camera.right = 5;
+        mainLight.shadow.camera.top = 5;
+        mainLight.shadow.camera.bottom = -5;
+        scene.add(mainLight);
+        
+        // Fill light dari belakang dengan warna kebiruan
+        const backLight = new THREE.PointLight(0x4466cc, 0.45);
+        backLight.position.set(-2, 1.5, -3);
+        scene.add(backLight);
+        
+        // Warm fill dari samping kanan
+        const warmFill = new THREE.PointLight(0xffaa66, 0.55);
+        warmFill.position.set(2.5, 1.8, 1.2);
+        scene.add(warmFill);
+        
+        // Rim light untuk highlight tepi
+        const rimLight = new THREE.PointLight(0xffaa88, 0.6);
+        rimLight.position.set(1, 2.2, -2.5);
+        scene.add(rimLight);
+        
+        // Light dari bawah untuk efek dramatis
+        const fillBottom = new THREE.PointLight(0x88aaff, 0.3);
+        fillBottom.position.set(0, -1.2, 0.5);
+        scene.add(fillBottom);
+        
+        // Optional: small light di sekitar lensa (efek kilau)
+        const lensGlow = new THREE.PointLight(0xffaa66, 0.4);
+        lensGlow.position.set(0.4, 0.6, 1.1);
+        scene.add(lensGlow);
+        
+        // --- Helper: Ground refleksi tipis (bidang transparan untuk bayangan) ---
+        const planeHelper = new THREE.Mesh(
+            new THREE.PlaneGeometry(6, 6),
+            new THREE.ShadowMaterial({ opacity: 0.4, color: 0x000000, transparent: true, side: THREE.DoubleSide })
+        );
+        planeHelper.rotation.x = -Math.PI / 2;
+        planeHelper.position.y = -0.65;
+        planeHelper.receiveShadow = true;
+        scene.add(planeHelper);
+        
+        // Dekorasi: lantai refleksi tipis grid
+        const gridHelper = new THREE.GridHelper(10, 20, 0x88aaff, 0x335588);
+        gridHelper.position.y = -0.6;
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.35;
+        scene.add(gridHelper);
+        
+        // --- Membangun Model Kamera 3D (Group) ---
+        const cameraGroup = new THREE.Group();
+        
+        // 1. Body utama kamera (kotak dengan lekukan)
+        const bodyGeo = new THREE.BoxGeometry(1.6, 1.2, 1.9);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2c2e3a, roughness: 0.35, metalness: 0.7, emissive: 0x111111 });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.castShadow = true;
+        body.receiveShadow = true;
+        body.position.y = 0;
+        cameraGroup.add(body);
+        
+        // Detail kulit kamera: bagian depan dengan tekstur (leather look via tambahan material)
+        const frontPanelGeo = new THREE.BoxGeometry(1.55, 0.9, 0.08);
+        const frontMat = new THREE.MeshStandardMaterial({ color: 0x1e1f2c, roughness: 0.5, metalness: 0.3 });
+        const frontPanel = new THREE.Mesh(frontPanelGeo, frontMat);
+        frontPanel.position.set(0, 0.05, 0.96);
+        frontPanel.castShadow = true;
+        cameraGroup.add(frontPanel);
+        
+        // 2. Lensa utama (silinder bertingkat)
+        const lensBaseGeo = new THREE.CylinderGeometry(0.68, 0.72, 0.35, 48);
+        const lensMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.2, metalness: 0.85 });
+        const lensBase = new THREE.Mesh(lensBaseGeo, lensMat);
+        lensBase.position.set(0, 0.12, 1.02);
+        lensBase.castShadow = true;
+        cameraGroup.add(lensBase);
+        
+        // Ring lensa metalik
+        const lensRingGeo = new THREE.TorusGeometry(0.72, 0.05, 32, 100);
+        const metalMat = new THREE.MeshStandardMaterial({ color: 0xccaa77, metalness: 0.9, roughness: 0.3 });
+        const lensRing = new THREE.Mesh(lensRingGeo, metalMat);
+        lensRing.rotation.x = Math.PI / 2;
+        lensRing.position.set(0, 0.12, 1.19);
+        cameraGroup.add(lensRing);
+        
+        // Lensa kaca (bagian depan)
+        const glassGeo = new THREE.SphereGeometry(0.62, 64, 64);
+        const glassMat = new THREE.MeshStandardMaterial({ color: 0x88aaff, emissive: 0x112233, metalness: 0.95, roughness: 0.18, transparent: true, opacity: 0.75 });
+        const glassLens = new THREE.Mesh(glassGeo, glassMat);
+        glassLens.position.set(0, 0.12, 1.23);
+        glassLens.castShadow = true;
+        cameraGroup.add(glassLens);
+        
+        // Inner lens detail (lingkaran hitam)
+        const innerLensGeo = new THREE.SphereGeometry(0.42, 48, 48);
+        const darkMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.1, metalness: 0.2 });
+        const innerLens = new THREE.Mesh(innerLensGeo, darkMat);
+        innerLens.position.set(0, 0.12, 1.27);
+        cameraGroup.add(innerLens);
+        
+        // Kilauan titik refleksi di lensa (titik kecil)
+        const specGlint = new THREE.Mesh(
+            new THREE.SphereGeometry(0.08, 16, 16),
+            new THREE.MeshStandardMaterial({ color: 0xffdd99, emissive: 0x442200, emissiveIntensity: 0.8 })
+        );
+        specGlint.position.set(0.2, 0.22, 1.32);
+        cameraGroup.add(specGlint);
+        
+        // 3. Prisma / Viewfinder (atas)
+        const viewfinderGeo = new THREE.BoxGeometry(0.85, 0.4, 0.5);
+        const viewMat = new THREE.MeshStandardMaterial({ color: 0x3a3c4a, metalness: 0.6, roughness: 0.4 });
+        const viewfinder = new THREE.Mesh(viewfinderGeo, viewMat);
+        viewfinder.position.set(0, 0.65, -0.25);
+        viewfinder.castShadow = true;
+        cameraGroup.add(viewfinder);
+        
+        // Jendela viewfinder (depan)
+        const eyePieceGeo = new THREE.BoxGeometry(0.5, 0.22, 0.05);
+        const blackMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.2 });
+        const eyePiece = new THREE.Mesh(eyePieceGeo, blackMat);
+        eyePiece.position.set(0, 0.68, 0.68);
+        cameraGroup.add(eyePiece);
+        
+        // 4. Tombol atas (mode dial)
+        const dialGeo = new THREE.CylinderGeometry(0.38, 0.38, 0.12, 32);
+        const dialMat = new THREE.MeshStandardMaterial({ color: 0xcdb38c, metalness: 0.7, roughness: 0.25 });
+        const mainDial = new THREE.Mesh(dialGeo, dialMat);
+        mainDial.position.set(-0.65, 0.75, 0.35);
+        mainDial.castShadow = true;
+        cameraGroup.add(mainDial);
+        
+        const dialTopGeo = new THREE.CylinderGeometry(0.28, 0.3, 0.08, 32);
+        const dialTopMat = new THREE.MeshStandardMaterial({ color: 0xddbb88, metalness: 0.8 });
+        const dialTop = new THREE.Mesh(dialTopGeo, dialTopMat);
+        dialTop.position.set(-0.65, 0.82, 0.35);
+        cameraGroup.add(dialTop);
+        
+        // Tombol shutter
+        const shutterGeo = new THREE.CylinderGeometry(0.22, 0.24, 0.1, 24);
+        const shutterMat = new THREE.MeshStandardMaterial({ color: 0xeeaa66, metalness: 0.5, emissive: 0x331100 });
+        const shutterBtn = new THREE.Mesh(shutterGeo, shutterMat);
+        shutterBtn.position.set(0.55, 0.78, 0.42);
+        cameraGroup.add(shutterBtn);
+        
+        // Tombol mode kecil
+        const smallBtnGeo = new THREE.SphereGeometry(0.12, 16);
+        const smallMat = new THREE.MeshStandardMaterial({ color: 0xaa8866 });
+        const modeBtn = new THREE.Mesh(smallBtnGeo, smallMat);
+        modeBtn.position.set(0.2, 0.82, 0.45);
+        cameraGroup.add(modeBtn);
+        
+        // 5. Grip samping (pegangan)
+        const gripGeo = new THREE.BoxGeometry(0.38, 0.9, 0.55);
+        const gripMat = new THREE.MeshStandardMaterial({ color: 0x22232e, roughness: 0.7 });
+        const grip = new THREE.Mesh(gripGeo, gripMat);
+        grip.position.set(0.95, -0.05, 0.35);
+        grip.castShadow = true;
+        cameraGroup.add(grip);
+        
+        // Detail texture grip (garis)
+        const gripLines = new THREE.Mesh(
+            new THREE.BoxGeometry(0.42, 0.75, 0.05),
+            new THREE.MeshStandardMaterial({ color: 0x4a3e32, roughness: 0.9 })
+        );
+        gripLines.position.set(1.12, -0.05, 0.35);
+        cameraGroup.add(gripLines);
+        
+        // 6. Flash hot shoe (atas)
+        const hotShoeGeo = new THREE.BoxGeometry(0.6, 0.08, 0.25);
+        const metalShoeMat = new THREE.MeshStandardMaterial({ color: 0xbbaa88, metalness: 0.85 });
+        const hotShoe = new THREE.Mesh(hotShoeGeo, metalShoeMat);
+        hotShoe.position.set(0, 0.92, -0.45);
+        cameraGroup.add(hotShoe);
+        
+        // 7. Port / konektor sisi
+        const sidePortGeo = new THREE.BoxGeometry(0.08, 0.25, 0.3);
+        const portMat = new THREE.MeshStandardMaterial({ color: 0x665533 });
+        const sidePort = new THREE.Mesh(sidePortGeo, portMat);
+        sidePort.position.set(0.85, 0.1, -0.65);
+        cameraGroup.add(sidePort);
+        
+        // 8. Strap lug (cincin kecil)
+        const lugGeo = new THREE.TorusGeometry(0.09, 0.04, 12, 24);
+        const lugMat = new THREE.MeshStandardMaterial({ color: 0xccaa88, metalness: 0.6 });
+        const lugLeft = new THREE.Mesh(lugGeo, lugMat);
+        lugLeft.position.set(-0.75, 0.35, 0.92);
+        lugLeft.rotation.z = Math.PI / 2;
+        cameraGroup.add(lugLeft);
+        
+        const lugRight = new THREE.Mesh(lugGeo, lugMat);
+        lugRight.position.set(0.75, 0.35, 0.92);
+        lugRight.rotation.z = Math.PI / 2;
+        cameraGroup.add(lugRight);
+        
+        // Tambahan aksen: beberapa titik LED kecil
+        const ledMat = new THREE.MeshStandardMaterial({ color: 0xff3333, emissive: 0x441111 });
+        const ledLight = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8), ledMat);
+        ledLight.position.set(0.4, 0.45, 0.98);
+        cameraGroup.add(ledLight);
+        
+        const ledGreenMat = new THREE.MeshStandardMaterial({ color: 0x44ff44, emissive: 0x226622 });
+        const ledGreen = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8), ledGreenMat);
+        ledGreen.position.set(-0.48, 0.42, 0.98);
+        cameraGroup.add(ledGreen);
+        
+        // --- Dekorasi Tambahan: Lingkaran krom di sekitar lensa ---
+        const chromeRingGeo = new THREE.TorusGeometry(0.74, 0.04, 48, 100);
+        const chromeMat = new THREE.MeshStandardMaterial({ color: 0xeeddcc, metalness: 0.95, roughness: 0.2 });
+        const chromeRing = new THREE.Mesh(chromeRingGeo, chromeMat);
+        chromeRing.rotation.x = Math.PI / 2;
+        chromeRing.position.set(0, 0.12, 1.18);
+        cameraGroup.add(chromeRing);
+        
+        // Efek lensa flair sederhana: lingkaran tipis tambahan
+        const lensHoodGeo = new THREE.TorusGeometry(0.79, 0.03, 32);
+        const lensHood = new THREE.Mesh(lensHoodGeo, chromeMat);
+        lensHood.rotation.x = Math.PI / 2;
+        lensHood.position.set(0, 0.12, 1.09);
+        cameraGroup.add(lensHood);
+        
+        scene.add(cameraGroup);
+        
+        // --- Membuat label CSS2D "Kamera Tangan" dengan efek stylish ---
+        const labelDiv = document.createElement('div');
+        labelDiv.textContent = '📸 CAMERA GRIP';
+        labelDiv.style.color = '#f2e8cf';
+        labelDiv.style.fontSize = '14px';
+        labelDiv.style.fontWeight = 'bold';
+        labelDiv.style.fontFamily = 'monospace';
+        labelDiv.style.backgroundColor = 'rgba(0,0,0,0.6)';
+        labelDiv.style.padding = '4px 12px';
+        labelDiv.style.borderRadius = '20px';
+        labelDiv.style.borderLeft = '3px solid #ffaa66';
+        labelDiv.style.backdropFilter = 'blur(4px)';
+        labelDiv.style.pointerEvents = 'none';
+        labelDiv.style.whiteSpace = 'nowrap';
+        
+        const labelObject = new CSS2DObject(labelDiv);
+        labelObject.position.set(0, 1.25, -0.5);
+        cameraGroup.add(labelObject);
+        
+        // Tambahan efek partikel di sekitar kamera (debu lensa / bokeh)
+        const particleCount = 400;
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(particleCount * 3);
+        for (let i = 0; i < particleCount; i++) {
+            particlePositions[i*3] = (Math.random() - 0.5) * 12;
+            particlePositions[i*3+1] = (Math.random() - 0.5) * 5 + 0.5;
+            particlePositions[i*3+2] = (Math.random() - 0.5) * 10 - 3;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+        const particleMat = new THREE.PointsMaterial({
+            color: 0x88aaff,
+            size: 0.035,
+            transparent: true,
+            opacity: 0.5,
+            blending: THREE.AdditiveBlending
+        });
+        const particles = new THREE.Points(particlesGeometry, particleMat);
+        scene.add(particles);
+        
+        // --- Background: Bintang halus untuk atmosfer ---
+        const starCount = 800;
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = [];
+        for (let i = 0; i < starCount; i++) {
+            starPos.push((Math.random() - 0.5) * 200);
+            starPos.push((Math.random() - 0.5) * 100);
+            starPos.push((Math.random() - 0.5) * 80 - 40);
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(starPos), 3));
+        const starMatGlow = new THREE.PointsMaterial({ color: 0xffffff, size: 0.08, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
+        const stars = new THREE.Points(starGeo, starMatGlow);
+        scene.add(stars);
+        
+        // --- Efek animasi rotasi lambat pada partikel & kilau lensa ---
+        // Juga membuat sedikit animasi pada intensitas lampu lensa
+        
+        // --- Simple floating animation untuk kamera (sedikit naik turun) ---
+        let time = 0;
+        
+        // --- Animasi CSS2D untuk selalu menghadap kamera? OrbitControls mengurusnya tapi CSS2DRenderer sudah face camera ---
+        
+        // --- Fungsi animasi loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.012;
+            
+            // Efek floating halus pada grup kamera (gerakan lembut)
+            cameraGroup.position.y = Math.sin(time * 1.2) * 0.012;
+            cameraGroup.rotation.z = Math.sin(time * 0.9) * 0.008;
+            cameraGroup.rotation.x = Math.sin(time * 0.7) * 0.005;
+            
+            // Partikel berputar perlahan
+            particles.rotation.y += 0.002;
+            particles.rotation.x = Math.sin(time * 0.2) * 0.1;
+            
+            // Bintang berotasi sangat lambat
+            stars.rotation.y += 0.0005;
+            stars.rotation.x += 0.0003;
+            
+            // Efek denyut lembut pada lensGlow
+            const intensity = 0.4 + Math.sin(time * 3) * 0.12;
+            lensGlow.intensity = intensity;
+            
+            // Update control (Orbit)
+            controls.update(); // diperlukan untuk damping dan update target
+            
+            // Render
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // --- Resize Handler ---
+        window.addEventListener('resize', onWindowResize, false);
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // small console log
+        console.log('3D Kamera Tangan siap | Interaksi aktif');
+        
+        // Menambahkan sedikit efek sparkle di sekitar lensa (opsional: lingkaran bercahaya)
+        const lensGlowMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(0.85, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xffaa66, transparent: true, opacity: 0.07, side: THREE.BackSide })
+        );
+        lensGlowMesh.position.set(0, 0.12, 1.2);
+        cameraGroup.add(lensGlowMesh);
+        
+    </script>
+</body>
+</html>
