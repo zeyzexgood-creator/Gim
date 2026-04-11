@@ -1,0 +1,273 @@
+/* ============================================ */
+/* MODERN COMPONENTS - CARDS, CHIPS, PLAYLIST   */
+/* ============================================ */
+
+/* Chip Categories */
+.chip-container {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 12px 0 8px;
+}
+
+.chip {
+    background: var(--bg-card);
+    padding: 10px 20px;
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    border: 1px solid var(--glass-border);
+    cursor: pointer;
+    transition: var(--transition-base);
+    flex-shrink: 0;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-sm);
+}
+
+.chip i {
+    margin-right: 6px;
+    font-size: 0.85rem;
+}
+
+.chip.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-color: transparent;
+    box-shadow: var(--shadow-glow);
+    transform: scale(1.02);
+}
+
+.chip:hover { 
+    background: rgba(255, 51, 102, 0.15);
+    border-color: var(--primary);
+}
+
+/* Music Card */
+.music-card {
+    flex: 0 0 140px;
+    cursor: pointer;
+    transition: var(--transition-base);
+    animation: cardFadeIn 0.4s ease forwards;
+    opacity: 0;
+}
+
+@keyframes cardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.music-card:hover {
+    transform: translateY(-6px);
+}
+
+.music-card:active { 
+    transform: scale(0.96); 
+}
+
+.card-thumbnail {
+    width: 140px;
+    height: 140px;
+    border-radius: var(--radius-lg);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-base);
+    overflow: hidden;
+}
+
+.music-card:hover .card-thumbnail {
+    box-shadow: var(--shadow-lg), 0 0 0 2px var(--primary);
+}
+
+.card-thumbnail::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.6) 100%);
+    opacity: 0;
+    transition: var(--transition-base);
+}
+
+.music-card:hover .card-thumbnail::before {
+    opacity: 1;
+}
+
+.thumbnail-overlay {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(10px) scale(0.8);
+    transition: var(--transition-base);
+    box-shadow: var(--shadow-glow);
+    backdrop-filter: blur(10px);
+}
+
+.music-card:hover .thumbnail-overlay { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.thumbnail-overlay i { 
+    color: white; 
+    font-size: 1rem;
+}
+
+.card-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: var(--transition-base);
+}
+
+.music-card:hover .card-title {
+    color: var(--primary-light);
+}
+
+.card-subtitle {
+    color: var(--text-tertiary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Playlist Card */
+.grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 8px;
+}
+
+.playlist-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: var(--transition-base);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    animation: cardFadeIn 0.4s ease forwards;
+    opacity: 0;
+}
+
+.playlist-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.playlist-card:active {
+    transform: scale(0.97);
+}
+
+.playlist-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-base);
+}
+
+.playlist-card:hover .playlist-thumb {
+    border-radius: var(--radius-lg);
+}
+
+.playlist-info { 
+    flex: 1; 
+    min-width: 0; 
+}
+
+.playlist-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.playlist-meta { 
+    color: var(--text-tertiary); 
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Quick Picks */
+.quick-picks-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 8px 0 20px;
+}
+
+.quick-pick-item { 
+    text-align: center; 
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.quick-pick-item:hover {
+    transform: translateY(-4px);
+}
+
+.quick-pick-thumb {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 8px;
+    border: 2px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-base);
+}
+
+.quick-pick-item:hover .quick-pick-thumb {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-glow);
+    transform: scale(1.05);
+}
+
+.quick-pick-name {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: var(--transition-base);
+}
+
+.quick-pick-item:hover .quick-pick-name {
+    color: var(--primary-light);
+}

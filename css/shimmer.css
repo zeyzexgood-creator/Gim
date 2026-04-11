@@ -1,0 +1,184 @@
+/* ============================================ */
+/* MODERN SHIMMER EFFECTS                      */
+/* ============================================ */
+
+.progress-bar-wrapper.buffering .progress-bar-fill {
+    opacity: 0.6;
+}
+
+.progress-shimmer-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+}
+
+.progress-shimmer {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 25%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.15) 75%,
+        transparent 100%
+    );
+    animation: shimmer 1.2s infinite;
+}
+
+.progress-buffer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: rgba(255, 51, 102, 0.15);
+    border-radius: var(--radius-full);
+    transition: width 0.3s ease;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Time shimmer */
+.time-shimmer {
+    display: inline-block;
+    width: 45px;
+    height: 14px;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.05) 100%
+    );
+    background-size: 200% 100%;
+    border-radius: var(--radius-full);
+    animation: shimmer 1.2s infinite;
+}
+
+/* Thumbnail shimmer */
+.thumbnail-shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+}
+
+.artwork-shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        transparent 100%
+    );
+    animation: shimmer 1.2s infinite;
+}
+
+.now-playing-shimmer-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.now-playing-shimmer {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 100%
+    );
+    animation: shimmer 1.2s infinite;
+}
+
+/* Loading dots */
+.loading-dots {
+    display: inline-block;
+}
+
+.loading-dots::after {
+    content: '';
+    animation: dots-content 1.5s infinite;
+}
+
+@keyframes dots-content {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+}
+
+/* Small loading spinner */
+.loading-spinner-small {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 51, 102, 0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+/* Card loading */
+.card-loading {
+    flex: 0 0 140px;
+}
+
+.card-loading .card-thumbnail {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.03) 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.03) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+}
+
+.card-loading .card-title-shimmer {
+    width: 100%;
+    height: 16px;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.03) 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.03) 100%
+    );
+    background-size: 200% 100%;
+    border-radius: var(--radius-sm);
+    animation: shimmer 1.2s infinite;
+    margin-bottom: 4px;
+}
+
+.card-loading .card-subtitle-shimmer {
+    width: 70%;
+    height: 12px;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.02) 0%,
+        rgba(255, 255, 255, 0.06) 50%,
+        rgba(255, 255, 255, 0.02) 100%
+    );
+    background-size: 200% 100%;
+    border-radius: var(--radius-sm);
+    animation: shimmer 1.2s infinite;
+}
